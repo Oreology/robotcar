@@ -188,6 +188,7 @@ void loop() {
         if (FrontDistance<=13) {
             if (RightFrontDistance < LeftFrontDistance) {
                 Mode = 3;   /* If RightFrontDistance is closer than LeftFrontDistance, turn Left. */
+            }
             else {
                 Mode = 2;   /* If Left is closer than Right, turn Right. */
             }
@@ -199,10 +200,11 @@ void loop() {
             FrontLeftMotor->setSpeed(255);
             RearRightMotor->setSpeed(-255);
             RearLeftMotor->setSpeed(255);
+        }
         elseif (LeftFrontDistance>11) {
-            FrontRightMotor->setSpeed(0);
+            FrontRightMotor->setSpeed(20);
             FrontLeftMotor->setSpeed(255);
-            RearRightMotor->setSpeed(0);
+            RearRightMotor->setSpeed(20);
             RearLeftMotor->setSpeed(255);
         }
         if (LeftRearDistance<=11) {
@@ -216,11 +218,12 @@ void loop() {
             FrontLeftMotor->setSpeed(-255);
             RearRightMotor->setSpeed(255);
             RearLeftMotor->setSpeed(-255);
+        }
         elseif (RightFrontDistance>11) {
             FrontRightMotor->setSpeed(255);
-            FrontLeftMotor->setSpeed(0);
+            FrontLeftMotor->setSpeed(20);
             RearRightMotor->setSpeed(255);
-            RearLeftMotor->setSpeed(0);
+            RearLeftMotor->setSpeed(20);
         }
         if (RightRearDistance<=11) {
             Mode = 4;   /* After RearDistance is correct distance to the right wall, track right. */
@@ -228,8 +231,13 @@ void loop() {
     }
     elseif (Mode==4) {  /* Tracking right */
         if (FrontDistance<=11 && FrontDistance>9 && RearDistance<=11 && RearDistance>9) {
-
-        elseif (FrontDistance>11 && RearDistance<=11s)
+            FrontRightMotor->setSpeed(255);
+            FrontLeftMotor->setSpeed(255);
+            RearRightMotor->setSpeed(255);
+            RearLeftMotor->setSpeed(255);
+        }
+        elseif (FrontDistance>11 && RearDistance<=11) {
+            FrontRightMotor->setSpeed()
         } 
     }
     else {
