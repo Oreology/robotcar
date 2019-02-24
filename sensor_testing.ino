@@ -44,8 +44,8 @@ Adafruit_DCMotor *FrontLeftMotor = AFMS.getMotor(4);
 /* Set speed goes from 0 to 255 */
 
 /* Front Ultrasonic */
-const int FrontTrig = 31;
-const int FrontEcho = 30;
+const int FrontTrig = 51;
+const int FrontEcho = 50;
 int FrontDistance;
 
 /* Rear Ultrasonic */
@@ -55,8 +55,8 @@ int RearDistance;
 
 /* Right Front Ultrasonic */
 
-const int RightFrontTrig = 51;
-const int RightFrontEcho = 50;
+const int RightFrontTrig = 31;
+const int RightFrontEcho = 30;
 int RightFrontDistance;
 
 /* Right Rear Ultrasonic */
@@ -82,6 +82,18 @@ void setup() {
     pinMode(FrontTrig, OUTPUT);
     pinMode(FrontEcho, INPUT);
 
+    pinMode(RightFrontTrig, OUTPUT);
+    pinMode(RightFrontEcho, INPUT);
+
+    pinMode(RightRearTrig, OUTPUT);
+    pinMode(RightRearEcho, INPUT);
+
+    pinMode(LeftFrontTrig, OUTPUT);
+    pinMode(LeftFrontEcho, INPUT);
+
+    pinMode(LeftRearTrig, OUTPUT);
+    pinMode(LeftRearEcho, INPUT);
+
     pinMode(RearTrig, OUTPUT);
     pinMode(RearEcho, INPUT);
 
@@ -97,12 +109,12 @@ void loop() {
     RearDistance = SonarDistance;
     SonarSensor(RightFrontTrig, RightFrontEcho);
     RightFrontDistance = SonarDistance;
-    /*SonarSensor(RightRearTrig, RightRearEcho);
+    SonarSensor(RightRearTrig, RightRearEcho);
     RightRearDistance = SonarDistance;
     SonarSensor(LeftFrontTrig, LeftFrontEcho);
     LeftFrontDistance = SonarDistance;
     SonarSensor(LeftRearTrig, LeftRearTrig);
-    LeftRearDistance = SonarDistance;*/
+    LeftRearDistance = SonarDistance;
 
     Serial.print("Front Distance: ");
     Serial.println(FrontDistance);
@@ -110,12 +122,12 @@ void loop() {
     Serial.println(RearDistance);
     Serial.print("RightFront Distance: ");
     Serial.println(RightFrontDistance);
-    /*Serial.print("RightRear Distance: ");
+    Serial.print("RightRear Distance: ");
     Serial.println(RightRearDistance);
     Serial.print("LeftFront Distance: ");
     Serial.println(LeftFrontDistance);
     Serial.print("RightRear Distance: ");
-    Serial.println(RightRearDistance);*/
+    Serial.println(RightRearDistance);
     
 }
 
