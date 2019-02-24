@@ -43,58 +43,47 @@ Adafruit_DCMotor *FrontLeftMotor = AFMS.getMotor(4);
 
 /* Set speed goes from 0 to 255 */
 
-/* Direction */
-int Direction = 0;          
-
 /* Front Ultrasonic */
 const int FrontTrig = 31;
 const int FrontEcho = 30;
-long FrontDuration;
 int FrontDistance;
+
+/* Rear Ultrasonic */
+const int RearTrig = 43;
+const int RearEcho = 42;
+int RearDistance;
 
 /* Right Front Ultrasonic */
 
 const int RightFrontTrig = 51;
 const int RightFrontEcho = 50;
-long RightFrontDuration;
 int RightFrontDistance;
 
 /* Right Rear Ultrasonic */
 const int RightRearTrig = 47;
 const int RightRearEcho = 46;
-long RightRearDuration;
 int RightRearDistance;
 
 /* Left Front Ultrasonic */
 const int LeftFrontTrig = 35;
 const int LeftFrontEcho = 34;
-long LeftFrontDuration;
 int LeftFrontDistance;
-
 
 /* Left Rear Ultrasonic */
 const int LeftRearTrig = 39;
 const int LeftRearEcho = 38;
-long LeftRearDuration;
 int LeftRearDistance;
 
-/* Rear Ultrasonic */
-const int RearTrig = 43;
-const int RearEcho = 42;
-long RearDuration;
-int RearDistance;
+int Mode1LED = 22;
+int Mode2LED = 23;
+int Mode3LED = 41;
+int Mode4LED = 45;
+int Mode5LED = 53;
+
+int SonarDistance, SonarDuration;
 
 int Mode = 1;
-/*
-    1 = Drive Straight
-    2 = Turning Right
-    3 = Turning Left
-    4 = Tracking Right
-    5 = Tracking Left
-    6 = Reverse 
-
-*/
-
+int Direction = 0;
 
 void setup() {
     Serial.begin(9600);
@@ -118,222 +107,249 @@ void setup() {
 
     pinMode(RearTrig, OUTPUT);
     pinMode(RearEcho, INPUT);
+    
+    pinMode(Mode1LED, OUTPUT);
+    pinMode(Mode2LED, OUTPUT);
+    pinMode(Mode3LED, OUTPUT);
+    pinMode(Mode4LED, OUTPUT);
+    pinMode(Mode5LED, OUTPUT);
+
+    StopMotor();
+    delay(1000);
+
 }
 
-
 void loop() {
-    long FrontDuration, FrontDistance;
-    long RightFrontDuration, RightFrontDistance;
-    long RightRearDuration, RightRearDistance;
-    long LeftFrontDuration, LeftFrontDistance;
-    long LeftRearDuration, LeftRearDistance;
-    long RearDuration, RearDistance;
 
-    /* Set Trig Pin to LOW and then HIGH */
-    digitalWrite(FrontTrig, LOW);
-    digitalWrite(RightFrontTrig, LOW);
-    digitalWrite(RightRearTrig, LOW);
-    digitalWrite(LeftFrontTrig, LOW);
-    digitalWrite(LeftRearTrig, LOW);
-    digitalWrite(RearTrig, LOW);
-    delayMicroseconds(2);
-    digitalWrite(FrontTrig, HIGH);
-    digitalWrite(RightFrontTrig, HIGH);
-    digitalWrite(RightRearTrig, HIGH);
-    digitalWrite(LeftFrontTrig, HIGH);
-    digitalWrite(LeftRearTrig, HIGH);
-    digitalWrite(RearTrig, HIGH);
-    delayMicroseconds(10);
-    digitalWrite(FrontTrig, LOW);
-    digitalWrite(RightFrontTrig, LOW);
-    digitalWrite(RightRearTrig, LOW);
-    digitalWrite(LeftFrontTrig, LOW);
-    digitalWrite(LeftRearTrig, LOW);
-
-    /* Measuring Duration from the Echo pins */
-    FrontDuration = pulseIn(FrontEcho, HIGH);
-    RightFrontDuration = pulseIn(RightFrontEcho, HIGH);
-    RightRearDuration = pulseIn(RightRearEcho, HIGH);
-    LeftFrontDuration = pulseIn(LeftFrontEcho, HIGH);
-    LeftRearDuration = pulseIn(LeftRearEcho, HIGH);
-    RearDuration = pulseIn(RearEcho, HIGH);
-
-    /* Calculate Distance from Duration */
-    FrontDistance = (FrontDuration/2)/29.1;
-    RightFrontDistance = (RightFrontDuration/2)/29.1;
-    RightRearDistance = (RightRearDuration/2)/29.1;
-    LeftFrontDistance = (LeftFrontDistance/2)/29.1;
-    LeftRearDistance = (LeftRearDistance/2)/29.1;
-    RearDistance = (RearDuration/2)/29.1;
-
-    /* Print Distance for Testing Purposes (all in cm)*/
-    /*
     Serial.print("Front Distance: ");
     Serial.println(FrontDistance);
+    Serial.print("Rear Distance: ");
+    Serial.println(RearDistance);
     Serial.print("RightFront Distance: ");
     Serial.println(RightFrontDistance);
     Serial.print("RightRear Distance: ");
-    Serial.print(RightRearDistance);
+    Serial.println(RightRearDistance);
     Serial.print("LeftFront Distance: ");
     Serial.println(LeftFrontDistance);
-    Serial.print("LeftRear Distance: ");
-    Serial.println(LeftRearDistance);
-    Serial.print("Rear Distance: ");
-    Serial.println(RearDistance);
-    */
-
+    Serial.print("RightRear Distance: ");
+    Serial.println(RightRearDistance);
+    
     if (Mode==1) {      /* Driving Straight Forward */
-        FrontRightMotor->setSpeed(255);
-        FrontLeftMotor->setSpeed(255);
-        RearRightMotor->setSpeed(255);
-        RearLeftMotor->setSpeed(255);
-        FrontRightMotor->run(FORWARD);
-        FrontLeftMotor->run(FORWARD);
-        RearRightMotor->run(FORWARD);
-        RearLeftMotor->run(FORWARD);
-        if (FrontDistance<=13) {
+        digitalWrite(Mode1LED, HIGH);
+        SonarSensor(FrontTrig, FrontEcho);
+        FrontDistance = SonarDistance;
+        SonarSensor(RightFrontTrig, RightFrontEcho);
+        RightFrontDistance = SonarDistance;
+        SonarSensor(LeftFrontTrig, LeftFrontEcho);
+        LeftFrontDistance = SonarDistance;
+
+        if (FrontDistance<=25) {
             if (RightFrontDistance < LeftFrontDistance) {
                 Mode = 3;   /* If RightFrontDistance is closer than LeftFrontDistance, turn Left. */
+                digitalWrite(Mode1LED, LOW);
             }
-            else {
+            else if (RightFrontDistance > LeftFrontDistance) {
                 Mode = 2;   /* If Left is closer than Right, turn Right. */
+                digitalWrite(Mode1LED, LOW);
             }
+        }
+        else {
+            FrontRightMotor->setSpeed(64);
+            FrontLeftMotor->setSpeed(64);
+            RearRightMotor->setSpeed(64);
+            RearLeftMotor->setSpeed(64);
+            FrontRightMotor->run(FORWARD);
+            FrontLeftMotor->run(FORWARD);
+            RearRightMotor->run(FORWARD);
+            RearLeftMotor->run(FORWARD);
         }
     }
     else if (Mode==2) {  /* Turning Right */
+        digitalWrite(Mode2LED, HIGH);
+        SonarSensor(LeftFrontTrig, LeftFrontEcho);
+        LeftFrontDistance = SonarDistance;
+        SonarSensor(LeftRearTrig, LeftRearEcho);
+        LeftRearDistance = SonarDistance;
+
         Direction = Direction + 1;
-        if (LeftFrontDistance<=11) {
-            FrontRightMotor->setSpeed(255);
-            FrontLeftMotor->setSpeed(255);
-            RearRightMotor->setSpeed(255);
-            RearLeftMotor->setSpeed(255);
+        if (LeftFrontDistance<=25) {
+            FrontRightMotor->setSpeed(64);
+            FrontLeftMotor->setSpeed(64);
+            RearRightMotor->setSpeed(64);
+            RearLeftMotor->setSpeed(64);
             FrontRightMotor->run(BACKWARD);
             FrontLeftMotor->run(FORWARD);
             RearRightMotor->run(BACKWARD);
             RearLeftMotor->run(FORWARD);
+            delay(250);
         }
-        else if (LeftFrontDistance>11) {
-            FrontRightMotor->setSpeed(20);
-            FrontLeftMotor->setSpeed(255);
-            RearRightMotor->setSpeed(20);
-            RearLeftMotor->setSpeed(255);
-            FrontRightMotor->run(FORWARD);
+        else if (LeftFrontDistance>25) {
+            FrontRightMotor->setSpeed(0);
+            FrontLeftMotor->setSpeed(64);
+            RearRightMotor->setSpeed(0);
+            RearLeftMotor->setSpeed(64);
+            FrontRightMotor->run(RELEASE);
             FrontLeftMotor->run(FORWARD);
-            RearRightMotor->run(FORWARD);
+            RearRightMotor->run(RELEASE);
             RearLeftMotor->run(FORWARD);
+            delay(100);
         }
-        if (LeftRearDistance<=11) {
-            Mode = 1;   /* After RearDistance is correct distance to the left wall, track left. */
+        if (LeftRearDistance<=14) {
+            digitalWrite(Mode2LED, LOW);
+            Mode = 5;   /* After RearDistance is correct distance to the left wall, track left. */
         }
     }
     else if (Mode==3) {  /* Turning Left */
+        digitalWrite(Mode3LED, HIGH);
+        SonarSensor(RightFrontTrig, RightFrontEcho);
+        RightFrontDistance = SonarDistance;
+        SonarSensor(RightRearTrig, RightRearEcho);
+        RightRearDistance = SonarDistance;
+
         Direction = Direction - 1;
-        if (RightFrontDistance<=11) {
-            FrontRightMotor->setSpeed(255);
-            FrontLeftMotor->setSpeed(255);
-            RearRightMotor->setSpeed(255);
-            RearLeftMotor->setSpeed(255);
+        if (RightFrontDistance<=25) {
+            FrontRightMotor->setSpeed(64);
+            FrontLeftMotor->setSpeed(64);
+            RearRightMotor->setSpeed(64);
+            RearLeftMotor->setSpeed(64);
             FrontRightMotor->run(FORWARD);
             FrontLeftMotor->run(BACKWARD);
             RearRightMotor->run(FORWARD);
             RearLeftMotor->run(BACKWARD);
+            delay(250);
         }
-        else if (RightFrontDistance>11) {
-            FrontRightMotor->setSpeed(255);
-            FrontLeftMotor->setSpeed(20);
-            RearRightMotor->setSpeed(255);
-            RearLeftMotor->setSpeed(20);
+        else if (RightFrontDistance>25) {
+            FrontRightMotor->setSpeed(64);
+            FrontLeftMotor->setSpeed(0);
+            RearRightMotor->setSpeed(64);
+            RearLeftMotor->setSpeed(0);
             FrontRightMotor->run(FORWARD);
-            FrontLeftMotor->run(FORWARD);
+            FrontLeftMotor->run(RELEASE);
             RearRightMotor->run(FORWARD);
-            RearLeftMotor->run(FORWARD);
+            RearLeftMotor->run(RELEASE);
+            delay(100);
         }
-        if (RightRearDistance<=11) {
-            Mode = 1;   /* After RearDistance is correct distance to the right wall, track right. */
+        if (RightRearDistance<=14) {
+            digitalWrite(Mode3LED, LOW);
+            Mode = 4;   /* After RearDistance is correct distance to the right wall, track right. */
         }
     }
     else if (Mode==4) {  /* Tracking right */
+        digitalWrite(Mode4LED, HIGH);
+        SonarSensor(FrontTrig, FrontEcho);
+        FrontDistance = SonarDistance;
+        SonarSensor(RightFrontTrig, RightFrontEcho);
+        RightFrontDistance = SonarDistance;
+        SonarSensor(RightRearTrig, RightRearEcho);
+        RightRearDistance = SonarDistance;
+
         int RightAngle;
         RightAngle = RightFrontDistance-RightRearDistance;
-        if (RightAngle>=0.5) {
+        if (RightAngle>=4) {
             FrontRightMotor->setSpeed(0);
-            FrontLeftMotor->setSpeed(255);
-            RearRightMotor->setSpeed(20);
-            RearLeftMotor->setSpeed(255);
-            FrontRightMotor->run(FORWARD);
+            FrontLeftMotor->setSpeed(64);
+            RearRightMotor->setSpeed(0);
+            RearLeftMotor->setSpeed(64);
+            FrontRightMotor->run(RELEASE);
             FrontLeftMotor->run(FORWARD);
-            RearRightMotor->run(BACKWARD);
+            RearRightMotor->run(RELEASE);
             RearLeftMotor->run(FORWARD);
         }
-        else if (RightAngle<=-0.5) {
-            FrontRightMotor->setSpeed(255);
+        else if (RightAngle<=-4) {
+            FrontRightMotor->setSpeed(64);
             FrontLeftMotor->setSpeed(0);
-            RearRightMotor->setSpeed(255);
-            RearLeftMotor->setSpeed(20);
+            RearRightMotor->setSpeed(64);
+            RearLeftMotor->setSpeed(0);
             FrontRightMotor->run(FORWARD);
-            FrontLeftMotor->run(FORWARD);
+            FrontLeftMotor->run(RELEASE);
             RearRightMotor->run(FORWARD);
-            RearLeftMotor->run(BACKWARD);
+            RearLeftMotor->run(RELEASE);
         }
         else {
-            FrontRightMotor->setSpeed(255);
-            FrontLeftMotor->setSpeed(255);
-            RearRightMotor->setSpeed(255);
-            RearLeftMotor->setSpeed(255);
+            FrontRightMotor->setSpeed(64);
+            FrontLeftMotor->setSpeed(64);
+            RearRightMotor->setSpeed(64);
+            RearLeftMotor->setSpeed(64);
             FrontRightMotor->run(FORWARD);
             FrontLeftMotor->run(FORWARD);
             RearRightMotor->run(FORWARD);
             RearLeftMotor->run(FORWARD);
         }
-        if (FrontDistance>=50) {    /* Detected a drop-off */
+        if (RightFrontDistance>=80) {    /* Detected a drop-off */
+            digitalWrite(Mode4LED, LOW);
             Mode = 1;
         }
-        else if (FrontDistance<=12) {
+        else if (FrontDistance<=20) {
+            digitalWrite(Mode4LED, LOW);
             Mode = 1;
         }
     }
     else if (Mode==5) { /* Tracking left */
+        digitalWrite(Mode5LED, HIGH);
+        SonarSensor(FrontTrig, FrontEcho);
+        FrontDistance = SonarDistance;
+        SonarSensor(LeftFrontTrig, LeftFrontEcho);
+        LeftFrontDistance = SonarDistance;
+        SonarSensor(LeftRearTrig, LeftRearEcho);
+        LeftRearDistance = SonarDistance;
+
         int LeftAngle;
         LeftAngle = LeftFrontDistance-LeftRearDistance;
-        if (LeftAngle>=0.5) {
-            FrontRightMotor->setSpeed(255);
+        if (LeftAngle>=4) {
+            FrontRightMotor->setSpeed(64);
             FrontLeftMotor->setSpeed(0);
-            RearRightMotor->setSpeed(255);
-            RearLeftMotor->setSpeed(20);
+            RearRightMotor->setSpeed(64);
+            RearLeftMotor->setSpeed(0);
             FrontRightMotor->run(FORWARD);
-            FrontLeftMotor->run(FORWARD);
+            FrontLeftMotor->run(RELEASE);
             RearRightMotor->run(FORWARD);
-            RearLeftMotor->run(BACKWARD);
+            RearLeftMotor->run(RELEASE);
         }
-        else if (LeftAngle<=-0.5) {
+        else if (LeftAngle<=-4) {
             FrontRightMotor->setSpeed(0);
-            FrontLeftMotor->setSpeed(255);
-            RearRightMotor->setSpeed(20);
-            RearLeftMotor->setSpeed(255);
-            FrontRightMotor->run(FORWARD);
+            FrontLeftMotor->setSpeed(64);
+            RearRightMotor->setSpeed(0);
+            RearLeftMotor->setSpeed(64);
+            FrontRightMotor->run(RELEASE);
             FrontLeftMotor->run(FORWARD);
-            RearRightMotor->run(BACKWARD);
+            RearRightMotor->run(RELEASE);
             RearLeftMotor->run(FORWARD);
         }
         else {
-            FrontRightMotor->setSpeed(255);
-            FrontLeftMotor->setSpeed(255);
-            RearRightMotor->setSpeed(255);
-            RearLeftMotor->setSpeed(255);
+            FrontRightMotor->setSpeed(64);
+            FrontLeftMotor->setSpeed(64);
+            RearRightMotor->setSpeed(64);
+            RearLeftMotor->setSpeed(64);
             FrontRightMotor->run(FORWARD);
             FrontLeftMotor->run(FORWARD);
             RearRightMotor->run(FORWARD);
             RearLeftMotor->run(FORWARD);
         }
-        if (FrontDistance>=50) {    /* Detected a drop-off while tracking */
+        if (LeftFrontDistance>=80) {    /* Detected a drop-off while tracking */
+            digitalWrite(Mode5LED, LOW);
             Mode = 1;
         }
-        else if (FrontDistance<=12) {   /* Detected an obstacle while tracking */
+        else if (FrontDistance<=20) {   /* Detected an obstacle while tracking */
+            digitalWrite(Mode5LED, LOW);
             Mode = 1;
         }
     }
 
-    delay(250); /* Half a second update time */
+}
 
+void StopMotor() {
+    FrontRightMotor->run(RELEASE);
+    FrontLeftMotor->run(RELEASE);
+    RearRightMotor->run(RELEASE);
+    RearLeftMotor->run(RELEASE);
+}
 
+void SonarSensor(int trigPin, int echoPin) {
+    digitalWrite(trigPin, LOW);
+    delayMicroseconds(2);
+    digitalWrite(trigPin, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trigPin, LOW);
+    SonarDuration = pulseIn(echoPin, HIGH);
+    SonarDistance = (SonarDuration/2) / 29.1;
 }
