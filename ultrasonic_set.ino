@@ -325,15 +325,15 @@ void loop() {
             RearRightMotor->run(FORWARD);
             RearLeftMotor->run(FORWARD);
         }
-        if (FrontDistance>=50) {    /* Detected a drop-off */
+        if (FrontDistance>=50) {    /* Detected a drop-off while tracking */
             Mode = 1;
         }
-        else if (FrontDistance<=12) {
+        else if (FrontDistance<=12) {   /* Detected an obstacle while tracking */
             Mode = 1;
         }
     }
 
-    delay(100); /* Half a second update time */
+    delay(250); /* Half a second update time */
 
 
 }
