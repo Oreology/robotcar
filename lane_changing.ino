@@ -16,7 +16,7 @@ const int ChangeLeftLED = 23;
 const int RightLED = 41;  
 const int ChangeRightLED = 53;
 
-const int InitialLaneChangeDelay = 2000;   // In seconds.
+const int InitialLaneChangeDelay = 4000;   // In seconds.
 const int SecondLaneChangeDelay = 3000;
 const int TurningDelay = 1500;
 const int LastDetectStraightDelay = 400;
@@ -32,8 +32,8 @@ const int LaneDetect = 1000;
 
 // HIGH = BLACK
 // LOW = WHITE
-const int ObstaclePinLeft = 27;  // This is our input pin - left position
-const int ObstaclePinRight = 26;  // This is our input pin - right position
+const int ObstaclePinLeft = 25;  // This is our input pin - left position
+const int ObstaclePinRight = 24;  // This is our input pin - right position
 int ObstacleLeft = LOW;  // LOW = nothing, go.
 int ObstacleRight = LOW;  // HIGH = black, turn / stop
 

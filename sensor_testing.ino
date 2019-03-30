@@ -80,11 +80,11 @@ int Mode3LED = 41;
 int Mode4LED = 45;
 int Mode5LED = 53;
 
-int FrontDetectionDistance = 25;    /* Used by straight mode and tracking mode for obstacle detection */
+int FrontDetectionDistance = 20;    /* Used by straight mode and tracking mode for obstacle detection */
 int TurningInPlaceDistance = 20;    /* Used by turning mode to reverse wheels and not advance */
-int TrackingStartDistance = 15;     /* Used by RightRear & LeftRear to start tracking mode out of turning mode */
+int TrackingStartDistance = 17;     /* Used by RightRear & LeftRear to start tracking mode out of turning mode */
 int FrontTrackingStartAngleDistance = 20;   /* Used by turning mode to make sure that the front angle is not too close and PREVENT START TRACKING THE CORNER */
-int TrackingDropOffDistance = 30;   /* Used by tracking mode to detect end of wall (or obstacle) */
+int TrackingDropOffDistance = 45;   /* Used by tracking mode to detect end of wall (or obstacle) */
 int TurningPreventTrackingDistance = 35;    /* While turning, if the FrontDistance is less than this value, then DONT START TRACKING THE CORNER */ 
 int DropOffTurnDelay = 2400;
 int DropOffStraightDelay = 1000;
@@ -275,6 +275,15 @@ void loop() {
             if (Direction > 0) {
                 //Mode = 3;
                 FrontRightMotor->setSpeed(85);
+                FrontLeftMotor->setSpeed(85);
+                RearRightMotor->setSpeed(85);
+                RearLeftMotor->setSpeed(85);
+                FrontRightMotor->run(FORWARD);
+                FrontLeftMotor->run(FORWARD);
+                RearRightMotor->run(FORWARD);
+                RearLeftMotor->run(FORWARD);
+                delay(500);
+                FrontRightMotor->setSpeed(85);
                 FrontLeftMotor->setSpeed(40);
                 RearRightMotor->setSpeed(85);
                 RearLeftMotor->setSpeed(40);
@@ -296,6 +305,15 @@ void loop() {
                 Mode = 5;
             } else if (Direction < 0) {
                 //Mode = 2;
+                FrontRightMotor->setSpeed(85);
+                FrontLeftMotor->setSpeed(85);
+                RearRightMotor->setSpeed(85);
+                RearLeftMotor->setSpeed(85);
+                FrontRightMotor->run(FORWARD);
+                FrontLeftMotor->run(FORWARD);
+                RearRightMotor->run(FORWARD);
+                RearLeftMotor->run(FORWARD);
+                delay(500);
                 FrontRightMotor->setSpeed(40);
                 FrontLeftMotor->setSpeed(85);
                 RearRightMotor->setSpeed(40);
@@ -379,6 +397,15 @@ void loop() {
             if (Direction > 0) {
                 //Mode = 3;
                 FrontRightMotor->setSpeed(85);
+                FrontLeftMotor->setSpeed(85);
+                RearRightMotor->setSpeed(85);
+                RearLeftMotor->setSpeed(85);
+                FrontRightMotor->run(FORWARD);
+                FrontLeftMotor->run(FORWARD);
+                RearRightMotor->run(FORWARD);
+                RearLeftMotor->run(FORWARD);
+                delay(400);
+                FrontRightMotor->setSpeed(85);
                 FrontLeftMotor->setSpeed(40);
                 RearRightMotor->setSpeed(85);
                 RearLeftMotor->setSpeed(40);
@@ -400,6 +427,15 @@ void loop() {
                 Mode = 5;
             } else if (Direction < 0) {
                 //Mode = 2;
+                FrontRightMotor->setSpeed(85);
+                FrontLeftMotor->setSpeed(85);
+                RearRightMotor->setSpeed(85);
+                RearLeftMotor->setSpeed(85);
+                FrontRightMotor->run(FORWARD);
+                FrontLeftMotor->run(FORWARD);
+                RearRightMotor->run(FORWARD);
+                RearLeftMotor->run(FORWARD);
+                delay(400);
                 FrontRightMotor->setSpeed(40);
                 FrontLeftMotor->setSpeed(85);
                 RearRightMotor->setSpeed(40);
